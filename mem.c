@@ -60,6 +60,6 @@ byte b_read(Adress adr) {
 }
 
 void w_write(Adress adr, word w){
-	mem[adr] = w & 511;
+	mem[adr] = w & 0xFF;
 	mem[adr + 1] = w >> 8;
 }
