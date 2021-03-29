@@ -1,5 +1,7 @@
 #include <stdio.h>
 #include <assert.h>
+#include <stdlib.h>
+#include <errno.h>
 
 typedef unsigned char byte;
 typedef unsigned short word;
@@ -13,6 +15,8 @@ void b_write(Adress adr, byte b);
 byte b_read(Adress adr);
 void w_write(Adress adr, word w);
 word w_read(Adress adr);
+
+void load_file(const char * filename);
 
 void test_mem()
 {
@@ -59,7 +63,29 @@ byte b_read(Adress adr) {
 	return mem[adr];
 }
 
-void w_write(Adress adr, word w){
+void w_write(Adress adr, word w) {
 	mem[adr] = w & 0xFF;
 	mem[adr + 1] = w >> 8;
 }
+
+void load_file(const char * filename) {
+	FILE * fin  = fopen(filename, "r");
+	if (fin == NULL) {
+		perror("data.txt");
+		exit(errno);
+	}
+
+	int adr, n;
+	while (fscanf(fin, "%x%x", &adr, &n) == 2)
+	{
+		for (int i = 0; i < n; ++i)
+		{
+			int val;
+			fscanf(fin, "%x", &val);
+			b_write (adr + i, (byte)val);
+		}
+	}
+
+	fclose(fin);
+}
+
