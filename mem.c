@@ -17,9 +17,11 @@ void w_write(Adress adr, word w);
 word w_read(Adress adr);
 
 void load_file(const char * filename);
+void mem_dump(Adress start, word n);
 
 void test_mem()
 {
+	/*-----------
 	byte b0 = 0x0a;
 
 	b_write(2, b0);
@@ -41,9 +43,12 @@ void test_mem()
 	wres = w_read(a);
 	printf("ww/wr %04hx=%04hx\n", wres, w);
 	assert(w == wres);
+	-----------*/
+	load_file("data.txt");
+	mem_dump(0x40, 4);
 }
 
-int main () {
+int main (int argc, char * argv[]) {
 	test_mem();
 	return 0;
 }
@@ -89,3 +94,10 @@ void load_file(const char * filename) {
 	fclose(fin);
 }
 
+void mem_dump(Adress start, word n) {
+	FILE* f = stdout;
+	for (Adress a = start; a < start + n; a += 2)
+	{
+		fprintf(f, "%06o : %06o\n", a, w_read(a));
+	}
+}
