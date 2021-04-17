@@ -8,8 +8,12 @@ typedef unsigned short word;
 typedef word Adress;
 
 #define MEMSIZE (64 * 1024)
+#define COMMAND_SET_SIZE 4
 
 byte mem[MEMSIZE];
+
+word reg[8];
+#define pc reg[7]
 
 void b_write(Adress adr, byte b);
 byte b_read(Adress adr);
@@ -18,39 +22,67 @@ word w_read(Adress adr);
 
 void load_file(const char * filename);
 void mem_dump(Adress start, word n);
+void do_add();
+void do_mov();
+void do_halt();
+void do_unknown();
+
+
+typedef struct {
+	word mask;
+	word opcode;
+	char * name;
+	void (*do_func)(void);
+} Command;
+Command cmd[] = {
+	{0177777, 0000000, "halt", do_halt},
+	{0170000, 0010000, "mov",  do_mov},
+	{0170000, 0060000, "add",  do_add},
+	{0170000, 0000000, "unknown", 	do_unknown}
+};
 
 void test_mem()
 {
-	/*-----------
-	byte b0 = 0x0a;
-
-	b_write(2, b0);
-	byte bres = b_read(2);
-	printf("%02hhx = %02hhx\n", b0, bres);
-	assert(b0 == bres);
-
-	Adress a = 4;
-	byte b1 = 0xcb;
-	b0 = 0x0a;
-	word w = 0xcb0a;
-	b_write(a, b0);
-	b_write(a + 1, b1);
-	word wres = w_read(a);
-	printf("ww/br \t %04hx=%02hhx%02hhx\n", wres, b1, b0);
-	assert(w == wres);
-
-	w_write(a, w);
-	wres = w_read(a);
-	printf("ww/wr %04hx=%04hx\n", wres, w);
-	assert(w == wres);
-	-----------*/
 	load_file("data.txt");
 	mem_dump(0x40, 4);
 }
 
+void run() {
+	pc = 01000;
+	while (1) {
+		word w = w_read(pc);
+		printf("%06o %06o: ", pc, w);
+		pc += 2;
+		for (int i = 0; i < COMMAND_SET_SIZE; ++i) {
+			Command com = cmd[i];
+			if ((w & com.mask) == com.opcode) {
+				printf("%s\n", com.name);
+				com.do_func();
+			}
+		}
+	}
+}
+
 int main (int argc, char * argv[]) {
-	test_mem();
+	char * filename = "data.txt";
+
+	load_file(filename);
+	run();
 	return 0;
+}
+
+void do_halt() {
+	printf("THE END!!!\n");
+	exit(0);
+}
+
+void do_mov() {
+}
+
+void do_add() {
+}
+
+void do_unknown() {
 }
 
 word w_read(Adress a) {
