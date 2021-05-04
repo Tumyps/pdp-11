@@ -9,6 +9,10 @@ typedef word Adress;
 
 #define MEMSIZE (64 * 1024)
 #define COMMAND_SET_SIZE 4
+#define NO_PARAMS 0
+#define HAS_DD 1
+#define HAS_SS 2
+
 
 byte mem[MEMSIZE];
 
@@ -27,62 +31,10 @@ void do_mov();
 void do_halt();
 void do_unknown();
 
-
-typedef struct {
-	word mask;
-	word opcode;
-	char * name;
-	void (*do_func)(void);
-} Command;
-Command cmd[] = {
-	{0177777, 0000000, "halt", do_halt},
-	{0170000, 0010000, "mov",  do_mov},
-	{0170000, 0060000, "add",  do_add},
-	{0170000, 0000000, "unknown", 	do_unknown}
-};
-
 void test_mem()
 {
 	load_file("data.txt");
 	mem_dump(0x40, 4);
-}
-
-void run() {
-	pc = 01000;
-	while (1) {
-		word w = w_read(pc);
-		printf("%06o %06o: ", pc, w);
-		pc += 2;
-		for (int i = 0; i < COMMAND_SET_SIZE; ++i) {
-			Command com = cmd[i];
-			if ((w & com.mask) == com.opcode) {
-				printf("%s\n", com.name);
-				com.do_func();
-			}
-		}
-	}
-}
-
-int main (int argc, char * argv[]) {
-	char * filename = "data.txt";
-
-	load_file(filename);
-	run();
-	return 0;
-}
-
-void do_halt() {
-	printf("THE END!!!\n");
-	exit(0);
-}
-
-void do_mov() {
-}
-
-void do_add() {
-}
-
-void do_unknown() {
 }
 
 word w_read(Adress a) {
