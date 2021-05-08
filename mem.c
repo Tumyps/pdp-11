@@ -2,6 +2,7 @@
 #include <assert.h>
 #include <stdlib.h>
 #include <errno.h>
+#include <string.h>
 
 typedef unsigned char byte;
 typedef unsigned short word;
@@ -18,6 +19,13 @@ byte mem[MEMSIZE];
 
 word reg[8];
 #define pc reg[7]
+
+typedef struct
+{
+	word val;
+	word adr;
+} Arg;
+Arg ss, dd;
 
 void b_write(Adress adr, byte b);
 byte b_read(Adress adr);
@@ -60,9 +68,13 @@ void w_write(Adress adr, word w) {
 void load_file(const char * filename) {
 	FILE * fin  = fopen(filename, "r");
 	if (fin == NULL) {
-		perror("data.txt");
+		char * buf = malloc(sizeof(char) * (strlen(filename) + 100));
+		sprintf(buf, "Cannot open the file: %s", filename);
+		perror(buf);
+		free(buf);
 		exit(errno);
 	}
+
 
 	int adr, n;
 	while (fscanf(fin, "%x%x", &adr, &n) == 2)
@@ -84,4 +96,10 @@ void mem_dump(Adress start, word n) {
 	{
 		fprintf(f, "%06o : %06o\n", a, w_read(a));
 	}
+}
+
+void print_reg() {
+	for (int i = 0; i < 6; ++i)
+		printf("R%d=%06o ", i, reg[i]);
+	printf("SP=%06o PC=%06o\n", reg[6], reg[7]);
 }
