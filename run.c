@@ -8,6 +8,8 @@
 
 word reg[8];
 
+Arg ss, dd;
+
 Command cmd[] = {
 	{0177777, 0000000, "halt", do_halt},
 	{0170000, 0010000, "mov",  do_mov},
@@ -29,7 +31,7 @@ Arg get_mr(word w) {
 	case 1:		// (R3)
 		res.adr = reg[r];
 		res.val = w_read(res.adr);
-		printf("R%o ", r);
+		printf("(R%o) ", r);
 		break;
 	case 2:		// (R3)+	#3
 		res.adr = reg[r];
@@ -38,7 +40,7 @@ Arg get_mr(word w) {
 		if (r == 7)
 			printf("#%o ", res.val);
 		else
-			printf("(R%o)", r);
+			printf("(R%o)+", r);
 		break;
 	default:
 		fprintf(stderr, "Mode %o NOT IMPLEMENTED YET\n", mode);
@@ -53,15 +55,17 @@ void run() {
 		word w = w_read(pc);
 		printf("%06o %06o: ", pc, w);
 		pc += 2;
-		for (int i = 0; i < COMMAND_SET_SIZE; ++i) {
+		for (int i = 0; cmd[i].mask == 0; ++i) {
 			Command com = cmd[i];
 			if ((w & com.mask) == com.opcode) {
-				printf("%s\n", com.name);
+				printf("%s ", com.name);
 				if (com.params & HAS_SS)
 					ss = get_mr(w >> 6);
 				if (com.params & HAS_DD)
 					dd = get_mr(w);
 				com.do_func();
+				printf("\n");
+				print_reg();
 				break;
 			}
 		}
