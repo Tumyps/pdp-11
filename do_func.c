@@ -2,7 +2,9 @@
 #include <assert.h>
 #include <stdlib.h>
 #include <errno.h>
-#include "mem.c"
+#include "mem.h"
+#include "run.h"
+
 
 void do_halt() {
 	printf("THE END!!!\n");
