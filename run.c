@@ -9,6 +9,7 @@
 word reg[8];
 
 Arg ss, dd;
+int is_byte;
 
 Command cmd[] = {
 	{0177777, 0000000, "halt", do_halt},
@@ -30,13 +31,22 @@ Arg get_mr(word w) {
 		break;
 	case 1:		// (R3)
 		res.adr = reg[r];
-		res.val = w_read(res.adr);
+		if(is_byte)
+			res.val = b_read(res.adr);
+		else
+			res.val = w_read(res.adr);
 		printf("(R%o) ", r);
 		break;
 	case 2:		// (R3)+	#3
 		res.adr = reg[r];
-		res.val = w_read(res.adr);
-		reg[r] += 2;
+		
+		if(is_byte)
+			res.val = b_read(res.adr);
+		else
+			res.val = w_read(res.adr);
+
+		reg[r] += 2 - is_byte;
+		
 		if (r == 7)
 			printf("#%o ", res.val);
 		else
@@ -55,6 +65,7 @@ void run() {
 		word w = w_read(pc);
 		printf("%06o %06o: ", pc, w);
 		pc += 2;
+		is_byte = (w >> 15) & 1;
 		for (int i = 0; cmd[i].mask == 0; ++i) {
 			Command com = cmd[i];
 			if ((w & com.mask) == com.opcode) {
