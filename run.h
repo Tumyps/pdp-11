@@ -10,7 +10,6 @@ typedef struct {
 	char params;
 } Command;
 
-#define COMMAND_SET_SIZE 4
 #define NO_PARAMS 0
 #define HAS_DD 1
 #define HAS_SS 2
@@ -21,7 +20,8 @@ typedef struct
 	word val;
 	word adr;
 } Arg;
-Arg ss, dd;
+
+extern Arg ss, dd;
 
 void run();
 void print_reg();
