@@ -2,15 +2,12 @@
 #include <assert.h>
 #include <stdlib.h>
 #include <errno.h>
-#include "do_func.c"
+#include "mem.h"
+#include "run.h"
+#include "do_func.h"
 
-typedef struct {
-	word mask;
-	word opcode;
-	char * name;
-	void (*do_func)(void);
-	char params;
-} Command;
+word reg[8];
+
 Command cmd[] = {
 	{0177777, 0000000, "halt", do_halt},
 	{0170000, 0010000, "mov",  do_mov},
@@ -65,7 +62,14 @@ void run() {
 				if (com.params & HAS_DD)
 					dd = get_mr(w);
 				com.do_func();
+				break;
 			}
 		}
 	}
+}
+
+void print_reg() {
+	for (int i = 0; i < 6; ++i)
+		printf("R%d=%06o ", i, reg[i]);
+	printf("SP=%06o PC=%06o\n", reg[6], reg[7]);
 }
