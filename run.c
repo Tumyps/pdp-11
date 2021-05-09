@@ -45,7 +45,7 @@ Arg get_mr(word w) {
 		else
 			res.val = w_read(res.adr);
 
-		reg[r] += 2 - is_byte;
+		reg[r] += 2 - (is_byte & (r < 6));
 		
 		if (r == 7)
 			printf("#%o ", res.val);
