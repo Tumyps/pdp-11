@@ -2,7 +2,9 @@
 #include <assert.h>
 #include <stdlib.h>
 #include <errno.h>
-#include "run.c"
+#include "mem.h"
+#include "run.h"
+
 
 int main (int argc, char * argv[]) {
 	char * filename = NULL;
