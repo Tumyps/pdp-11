@@ -5,7 +5,6 @@
 #include "mem.h"
 #include "run.h"
 
-
 void do_halt() {
 	printf("THE END!!!\n");
 	print_reg();
@@ -17,6 +16,7 @@ void do_mov() {
 }
 
 void do_add() {
+	w_write(dd.adr, ss.val + dd.val);
 }
 
 void do_unknown() {
