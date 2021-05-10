@@ -4,6 +4,8 @@
 #include <errno.h>
 #include <string.h>
 #include "mem.h"
+#include "run.h"
+
 
 
 byte mem[MEMSIZE];
@@ -22,6 +24,8 @@ word w_read(Adress a) {
 }
 
 void b_write(Adress adr, byte b) {
+	if (adr < 8)
+		reg[adr] = (word)b;
 	mem[adr] = b;
 }
 
@@ -30,6 +34,8 @@ byte b_read(Adress adr) {
 }
 
 void w_write(Adress adr, word w) {
+	if (adr < 8)
+		reg[adr] = w;
 	mem[adr] = w & 0xFF;
 	mem[adr + 1] = w >> 8;
 }
