@@ -12,10 +12,10 @@ Arg ss, dd;
 int is_byte;
 
 Command cmd[] = {
-	{0177777, 0000000, "halt", do_halt},
-	{0170000, 0010000, "mov",  do_mov},
-	{0170000, 0060000, "add",  do_add},
-	{0000000, 0000000, "unknown", 	do_unknown}
+	{0177777, 0000000, "halt", do_halt, NO_PARAMS},
+	{0170000, 0010000, "mov",  do_mov, HAS_DD | HAS_SS},
+	{0170000, 0060000, "add",  do_add, HAS_DD | HAS_SS},
+	{0000000, 0000000, "unknown", 	do_unknown, NO_PARAMS}
 };
 
 
@@ -31,7 +31,7 @@ Arg get_mr(word w) {
 		break;
 	case 1:		// (R3)
 		res.adr = reg[r];
-		if(is_byte)
+		if (is_byte)
 			res.val = b_read(res.adr);
 		else
 			res.val = w_read(res.adr);
@@ -39,14 +39,14 @@ Arg get_mr(word w) {
 		break;
 	case 2:		// (R3)+	#3
 		res.adr = reg[r];
-		
-		if(is_byte)
+
+		if (is_byte)
 			res.val = b_read(res.adr);
 		else
 			res.val = w_read(res.adr);
 
 		reg[r] += 2 - (is_byte & (r < 6));
-		
+
 		if (r == 7)
 			printf("#%o ", res.val);
 		else
@@ -66,7 +66,7 @@ void run() {
 		printf("%06o %06o: ", pc, w);
 		pc += 2;
 		is_byte = (w >> 15) & 1;
-		for (int i = 0; cmd[i].mask == 0; ++i) {
+		for (int i = 0; cmd[i].mask != 0; ++i) {
 			Command com = cmd[i];
 			if ((w & com.mask) == com.opcode) {
 				printf("%s ", com.name);
