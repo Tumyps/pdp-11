@@ -22,6 +22,7 @@ typedef struct
 } Arg;
 
 extern Arg ss, dd;
+extern word reg[8];
 
 void run();
 void print_reg();
